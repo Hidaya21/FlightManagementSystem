@@ -41,7 +41,7 @@
                     {
                         if(passenger.ToLower() == name.ToLower())
                         {
-
+                            Console.WriteLine("Passenger added seccussfully");
                         }
                     }
 
