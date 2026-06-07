@@ -6,8 +6,8 @@
         static List<string> ticketNumbers = new List<string> { "TKT-1", "TKT-2", "TKT-3" };
         static List<string> cancelledTickets = new List<string>();
         static string[] flightNumbers = { "FL-001", "FL-002", "FL-003" };
-        List<string> availableDates = new List<string> {"2026-06-10","2026-06-11","2026-06-12" };
-        Dictionary<string, string> bookingRecord = new Dictionary<string, string>();
+        static List<string> availableDates = new List<string> {"2026-06-10","2026-06-11","2026-06-12" };
+        static Dictionary<string, string> bookingRecord = new Dictionary<string, string>();
 
         
 
@@ -80,6 +80,48 @@
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine("Total Passengers: " + passengerNames.Count);
         }
+
+        public static void ViewBookingDetails()
+        {
+            Console.Write("Enter your ticket: ");
+            string ticketID = Console.ReadLine();
+            //Validate ticket exists in ticketNumbers
+            if (!ticketNumbers.Contains(ticketID))
+            {
+                Console.WriteLine("Ticket does not exist ");
+                return;
+            }
+            //Get passenger name using index
+            int index = ticketNumbers.IndexOf(ticketID);
+            string passengerName = passengerNames[index];
+
+            //Check if ticket is cancelled
+            if (cancelledTickets.Contains(ticketID))
+            {
+                Console.WriteLine("This ticket is cancelled");
+                return;
+
+            }
+            //Check booking record in dictionary
+            if (!bookingRecord.ContainsKey(ticketID))
+            {
+                Console.WriteLine("No booking found for this ticket.");
+                return;
+            }
+            // Retrieve and split booking details
+            string bookingInfo = bookingRecord[ticketID];
+            string[] parts = bookingInfo.Split('|');
+
+            string flightNumber = parts[0];
+            string date = parts[1];
+
+            //Display booking summary
+            Console.WriteLine("===== BOOKING SUMMARY =====");
+            Console.WriteLine("Passenger Name : " + passengerName);
+            Console.WriteLine("Ticket ID      : " + ticketID);
+            Console.WriteLine("Flight Number  : " + flightNumber);
+            Console.WriteLine("Date           : " + date);
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("================================= ");
@@ -110,6 +152,7 @@
                 case 3:
                     Console.Write("Enter your ticket: ");
                     string ticket = Console.ReadLine();
+                    //Validate ticket exists in ticketNumbers
                     if (!ticketNumbers.Contains(ticket))
                     {
                         Console.WriteLine("Ticket does not exist ");
@@ -120,9 +163,14 @@
                         Console.WriteLine("This ticket is cancelled");
                         return;
                     }
-                   
+                    
+                 
+
+
                     break;
                 case 4:
+                    ViewBookingDetails();
+
                     break;
                 case 5:
                     break;
