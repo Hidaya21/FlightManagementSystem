@@ -2,6 +2,39 @@
 {
     internal class Program
     {
+        public static void RegisterNewPassenger()
+        {
+            List<string> passengerNames = new List<string> { "Sara", "Fahad", "Nasser" };
+            List<string> ticketNumbers = new List<string> { "TKT-1", "TKT-2", "TKT-3" };
+            Console.Write("Enter passenger name: ");
+            string name = Console.ReadLine();
+            //check if name is empty
+            if (name.Trim() == "")
+            {
+                Console.WriteLine("Error passenger name cannot be empty");
+                return;
+
+            }
+            else
+            {
+                foreach (string passenger in passengerNames)
+                {
+                    if (passenger.ToLower() == name.ToLower())
+                    {
+                        Console.WriteLine("Error passenger already exit");
+                        return;
+                    }
+                }
+
+            }
+            string ticketId = "TKT-" + (passengerNames.Count + 1);
+            passengerNames.Add(name);
+            ticketNumbers.Add(ticketId);
+
+            Console.WriteLine("Passenger registered successfully!");
+            Console.WriteLine("Passenger Name: " + name);
+            Console.WriteLine("Ticket ID: " + ticketId);
+        }
         static void Main(string[] args)
         {
             Console.WriteLine("================================= ");
@@ -24,28 +57,8 @@
             switch (choice)
             {
                 case 1:
-                    List<string> passengerNames = new List<string>();
-                    List<string> ticketNumbers = new List<string>();
-                    Console.Write("Enter passenger name: ");
-                    string name = Console.ReadLine();
-                    //check if name is empty
-                    if (name.Trim() != "")
-                    {
-                        Console.WriteLine("Error passenger name cannot be empty");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Passenger added seccussfully");
-                    }
-                    foreach(string passenger in passengerNames)
-                    {
-                        if(passenger.ToLower() == name.ToLower())
-                        {
-                            Console.WriteLine("Passenger added seccussfully");
-                        }
-                    }
-
-                        break;
+                    RegisterNewPassenger();
+                     break;
                 case 2:
                     break;
                 case 3:
