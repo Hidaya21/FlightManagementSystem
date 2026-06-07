@@ -1,4 +1,6 @@
-﻿namespace TSDSCAP01
+﻿using System.Net.Sockets;
+
+namespace TSDSCAP01
 {
     internal class Program
     {
@@ -80,6 +82,73 @@
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine("Total Passengers: " + passengerNames.Count);
         }
+        public static void BookFlightTicke()
+        {
+            Console.Write("Enter your ticket: ");
+            string ticket = Console.ReadLine();
+            //Validate ticket exists in ticketNumbers
+            if (!ticketNumbers.Contains(ticket))
+            {
+                Console.WriteLine("Ticket does not exist ");
+                return;
+            }
+            //Check if ticket is cancelled
+            if (cancelledTickets.Contains(ticket))
+            {
+                Console.WriteLine("This ticket is cancelled");
+                return;
+            }
+            //Check booking record in dictionary
+            if (!bookingRecord.ContainsKey(ticket))
+            {
+                Console.WriteLine("No booking found for this ticket.");
+                return;
+            }
+            Console.WriteLine("Flights: ");
+            for (int i = 0; i < flightNumbers.Length; i++)
+            {
+                Console.WriteLine(i + ": " + flightNumbers[i]);
+            }
+            // Ask user to select a flight
+            Console.Write("Select Flight: ");
+            int flightChoice = int.Parse(Console.ReadLine());
+            // Validate flight selection
+            if (flightChoice < 1 || flightChoice > flightNumbers.Length)
+            {
+                Console.WriteLine("Invalid flight choice");
+                return;
+            }
+            // Get selected flight
+            string selectedFlight = flightNumbers[flightChoice - 1];
+            // Display all available dates with index numbers
+            Console.WriteLine("Available Dates:");
+            for (int i = 0; i < availableDates.Count; i++)
+            {
+                Console.WriteLine((i + 1) + ". " + availableDates[i]);
+            }
+            // Ask user to select a date
+            Console.Write("Select Date: ");
+            int dateChoice = int.Parse(Console.ReadLine());
+            // Validate date selection
+            if (dateChoice < 1 || dateChoice > availableDates.Count)
+            {
+                Console.WriteLine("Invalid date choice.");
+                return;
+            }
+            // Get selected date
+            string selectedDate = availableDates[dateChoice - 1];
+            // Add or update booking in dictionary 
+            bookingRecord.Add(ticket, selectedFlight + "|" + selectedDate);
+            // Find passenger index in list
+            int passengerIndex = ticketNumbers.IndexOf(ticket);
+            // Show confirmation message
+            Console.WriteLine("Booking Confirmed!");
+            Console.WriteLine("Passenger Name: " + passengerNames[passengerIndex]);
+            Console.WriteLine("Ticket ID: " + ticket);
+            Console.WriteLine("Flight: " + selectedFlight);
+            Console.WriteLine("Date: " + selectedDate);
+
+        }
 
         public static void ViewBookingDetails()
         {
@@ -150,23 +219,7 @@
                     ViewAllPassengers();
                     break;
                 case 3:
-                    Console.Write("Enter your ticket: ");
-                    string ticket = Console.ReadLine();
-                    //Validate ticket exists in ticketNumbers
-                    if (!ticketNumbers.Contains(ticket))
-                    {
-                        Console.WriteLine("Ticket does not exist ");
-                        return;
-                    }
-                    if (cancelledTickets.Contains(ticket))
-                    {
-                        Console.WriteLine("This ticket is cancelled");
-                        return;
-                    }
-                    
-                 
-
-
+                    BookFlightTicke();
                     break;
                 case 4:
                     ViewBookingDetails();
