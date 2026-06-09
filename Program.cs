@@ -10,6 +10,8 @@ namespace TSDSCAP01
         static string[] flightNumbers = { "FL-001", "FL-002", "FL-003" };
         static List<string> availableDates = new List<string> { "2026-06-10", "2026-06-11", "2026-06-12" };
         static Dictionary<string, string> bookingRecord = new Dictionary<string, string>();
+        static Queue<string> checkedInQueue = new Queue<string>();
+        static Stack<string> boardingStack = new Stack<string>();
 
 
 
@@ -319,13 +321,10 @@ namespace TSDSCAP01
                 Console.WriteLine("Invalid menu option");
                 return;
             }
-
             //Update dictionary 
             bookingRecord[ticket] = newFlight + "|" + newDate;
-
             //Confirmation
             Console.WriteLine("Booking Updated Successfully!");
-
             Console.WriteLine("OLD BOOKING:");
             Console.WriteLine("Flight: " + oldFlight);
             Console.WriteLine("Date: " + oldDate);
@@ -334,6 +333,99 @@ namespace TSDSCAP01
             Console.WriteLine("Date: " + newDate);
 
 
+        }
+        public static void CancelTicket()
+        {
+            Console.Write("Enter Ticket ID: ");
+            string ticket = Console.ReadLine();
+            // Check ticket exists
+            if (!ticketNumbers.Contains(ticket))
+            {
+                Console.WriteLine("Ticket ID does not exist");
+                return;
+            }
+            // Check ticket is not cancelled
+            if (cancelledTickets.Contains(ticket))
+            {
+                Console.WriteLine("This ticket has been cancelled");
+            }
+            int index = ticketNumbers.IndexOf(ticket);
+            string passengerName = passengerNames[index];
+            Console.WriteLine("Passenger: " + passengerName);
+            if (bookingRecord.ContainsKey(ticket))
+            {
+                string removedBooking = bookingRecord[ticket];
+
+                Console.WriteLine("Removed Booking: " + removedBooking);
+                bookingRecord.Remove(ticket);
+            }
+            else
+            {
+                Console.WriteLine("No booking record found");
+            }
+            // Add ticket to cancelled list
+            cancelledTickets.Add(ticket);
+            // Remove from check-in queue
+            bool removedFromQueue = false;
+            Queue<string> tempQueue = new Queue<string>();
+            while (checkedInQueue.Count > 0)
+            {
+                string passenger = checkedInQueue.Dequeue();
+                if (passenger != passengerName)
+                {
+                    tempQueue.Enqueue(passenger);
+                }
+                else
+                {
+                    removedFromQueue = true;
+                }
+            }
+            while (tempQueue.Count > 0)
+            {
+                checkedInQueue.Enqueue(tempQueue.Dequeue());
+            }
+
+            if (removedFromQueue)
+            {
+                Console.WriteLine("Passenger removed from check-in queue.");
+            }
+            // Remove from boarding stack
+            bool removedFromStack = false;
+
+            Stack<string> tempStack = new Stack<string>();
+            Stack<string> rebuiltStack = new Stack<string>();
+
+            while (boardingStack.Count > 0)
+            {
+                tempStack.Push(boardingStack.Pop());
+            }
+
+            while (tempStack.Count > 0)
+            {
+                string passenger = tempStack.Pop();
+
+                if (passenger != passengerName)
+                {
+                    rebuiltStack.Push(passenger);
+                }
+                else
+                {
+                    removedFromStack = true;
+                }
+            }
+
+            boardingStack = rebuiltStack;
+
+            if (removedFromStack)
+            {
+                Console.WriteLine("Passenger removed from boarding stack");
+            }
+
+            // Cancellation summary
+            Console.WriteLine("===== Cancellation Summary =====");
+            Console.WriteLine("Passenger Name: " + passengerName);
+            Console.WriteLine("Ticket ID: " + ticket);
+            Console.WriteLine("Status: Cancelled");
         }
         static void Main(string[] args)
         {
@@ -375,6 +467,7 @@ namespace TSDSCAP01
                         UpdateBooking();
                         break;
                     case 6:
+                        CancelTicket();
                         break;
                     case 7:
                         break;
