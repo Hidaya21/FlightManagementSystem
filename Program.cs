@@ -12,7 +12,7 @@ namespace TSDSCAP01
         static Dictionary<string, string> bookingRecord = new Dictionary<string, string>();
         static Queue<string> checkedInQueue = new Queue<string>();
         static Stack<string> boardingStack = new Stack<string>();
-
+        static Queue<string> waitlistQueue = new Queue<string>();
 
 
         public static void RegisterNewPassenger()
@@ -97,8 +97,8 @@ namespace TSDSCAP01
             //Check if ticket is cancelled
             if (cancelledTickets.Contains(ticket))
             {
-                Console.WriteLine("This ticket is cancelled");
-                return;
+                cancelledTickets.Add(ticket);
+                
             }
             //Check booking record in dictionary
             if (bookingRecord.ContainsKey(ticket))
@@ -420,12 +420,118 @@ namespace TSDSCAP01
             {
                 Console.WriteLine("Passenger removed from boarding stack");
             }
-
             // Cancellation summary
             Console.WriteLine("===== Cancellation Summary =====");
             Console.WriteLine("Passenger Name: " + passengerName);
             Console.WriteLine("Ticket ID: " + ticket);
             Console.WriteLine("Status: Cancelled");
+        }
+        public static void PassengerCheckIn()
+        {
+            Console.WriteLine("Choose update option:");
+            Console.WriteLine("1. Check in a passenger");
+            Console.WriteLine("2. View check-in queue");
+            Console.WriteLine("3. Process next passenger ");
+            Console.WriteLine("0. Back ");
+            Console.Write("Enter your choice: ");
+            int choice = int.Parse(Console.ReadLine());
+            bool exit = false;
+            while (exit == false)
+            {
+                switch (choice)
+                {
+                    case 1:
+                        Console.Write("Enter Ticket ID: ");
+                        string ticket = Console.ReadLine();
+                        // Check ticket exists
+                        if (!ticketNumbers.Contains(ticket))
+                        {
+                            Console.WriteLine("Ticket ID does not exist");
+                            return;
+                        }
+                        // Check ticket is not cancelled
+                        if (cancelledTickets.Contains(ticket))
+                        {
+                            Console.WriteLine("This ticket has been cancelled");
+                        }
+                        //Check booking record in dictionary
+                        if (!bookingRecord.ContainsKey(ticket))
+                        {
+                            Console.WriteLine("No booking found for this ticket.");
+                            return;
+                        }
+                        int index = ticketNumbers.IndexOf(ticket);
+                        string passengerName = passengerNames[index];
+                        if (checkedInQueue.Contains(passengerName))
+                        {
+                            Console.WriteLine("Passenger already checked in");
+                        }
+                        if (checkedInQueue.Count < 10)
+                        {
+                            checkedInQueue.Enqueue(passengerName);
+                            Console.WriteLine(passengerName + " checked in successfully.");
+                        }
+                        else
+                        {
+                            waitlistQueue.Enqueue(passengerName);
+                            Console.WriteLine("Check-in queue is full");
+                        }
+                        break;
+                    case 2:
+                        Console.WriteLine("Check In Queue");
+
+                        if (checkedInQueue.Count == 0)
+                        {
+                            Console.WriteLine("Queue is empty.");
+                        }
+                        else
+                        {
+                            int position = 1;
+                            foreach (string passenger in checkedInQueue)
+                            {
+                                Console.WriteLine(position + ":" + passenger);
+                                position++;
+                            }
+                        }
+                        Console.WriteLine("Waitlist Count: " + waitlistQueue.Count);
+
+                        break;
+                    case 3:
+                        Console.WriteLine("View check-in queue");
+                        if (checkedInQueue.Count == 0)
+                        {
+                            Console.WriteLine("No passengers to process.");
+                        }
+                        else
+                        {
+                            string processedPassenger = checkedInQueue.Dequeue();
+
+                            Console.WriteLine("Processed passenger: " + processedPassenger);
+                            // Move one passenger from waitlist
+                            if (waitlistQueue.Count > 0)
+                            {
+                                string movedPassenger = waitlistQueue.Dequeue();
+                                checkedInQueue.Enqueue(movedPassenger);
+                                Console.WriteLine(movedPassenger + " moved from waitlist to check-in queue");
+                            }
+                        }
+                        break;
+                    case 0:
+                        Console.WriteLine("Exit");
+                        exit = true;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice");
+                        break;
+                }
+                Console.Write(" press any key to countinue...  ");
+                Console.ReadLine();
+                Console.Clear();
+            }
+        }
+        public static void BoardPassengers()
+        {
+
         }
         static void Main(string[] args)
         {
@@ -470,6 +576,7 @@ namespace TSDSCAP01
                         CancelTicket();
                         break;
                     case 7:
+                        PassengerCheckIn();
                         break;
                     case 8:
                         break;
@@ -481,8 +588,9 @@ namespace TSDSCAP01
                         Console.WriteLine("Exit");
                         exit = true;
                         break;
-
-
+                    default:
+                        Console.WriteLine("Invalid choice");
+                        break;
                 }
                 Console.Write(" press any key to countinue...  ");
                 Console.ReadLine();
